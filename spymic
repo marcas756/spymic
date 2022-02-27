@@ -1,0 +1,67 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides: 		spymic
+# Required-Start: 	$local_fs $network
+# Required-Stop:	$local_fs $network
+# Default-Start: 	2 3 4 5
+# Default-Stop: 	0 1 6
+# Description: 		Spymic via icecast
+### END INIT INFO
+
+###### Configuration ###### 
+ 
+export SPYMIC_DIR=/home/pi/spymic
+export ICECAST_SERVER=domain.topleveldomain
+export ICECAST_PORT=8000
+export ICECAST_SRC_PWD=icecast_src_pwd
+
+export MIC_NAME="USB-Audio - USB Audio Device" 
+#export MIC_NAME="USB-Audio - USB PnP Sound Device"
+
+#-q -2	~32	~32 – ~64	point/lossless	yes	(1)
+#-q -1	~48	~48 – ~64	point/lossless	yes	(2)
+#-q 0	~64	~64 – ~80	point/lossless	yes
+#-q 1	~80	~80 – ~96	point/lossless	yes	(3)
+#-q 2	~96	~96 – ~112	point/lossless	yes
+#-q 3	~112	~112 – ~128	point/lossless	yes
+#-q 4	~128	~128 – ~160	point/lossless	no
+#-q 5	~160	~160 – ~192	point/lossless	no	(4)
+#-q 6	~192	~192 – ~224	lossless	no
+#-q 7	~224	~224 – ~256	lossless	no
+#-q 8	~256	~256 – ~320	lossless	no
+#-q 9	~320	~320 – ~500	lossless	no
+#-q 10	~500	~500 – ~1000	lossless	no
+
+export AUDIO_QUALITY=4
+export RETRY_INTERVAL=1
+ 
+###### Spymic via icecast ######
+ 
+case "$1" in
+start)
+	echo "Starting spymic ..." >&2
+	$SPYMIC_DIR/spymic_start.sh &
+	;;
+stop)
+	$SPYMIC_DIR/spymic_stop.sh
+	;;
+restart)
+	$0 stop
+	$0 start
+	;;
+status)
+	if [ -e $SPYMIC_DIR/spymic.pid ]; then
+		echo spymic is running, pid=`cat $SPYMIC_DIR/spymic.pid`
+	else
+		echo spymic is NOT running
+		exit 1
+	fi
+	;;
+*)
+	echo "Usage: {start|stop|restart|status}" >&2
+	exit 1
+	;;
+esac
+
+exit 0
